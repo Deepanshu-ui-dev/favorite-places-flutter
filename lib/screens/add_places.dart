@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:favorite_places/providers/user_places.dart';
+import 'package:favorite_places/widgets/image_input.dart';
+import 'package:favorite_places/widgets/location_input.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -11,7 +15,8 @@ class AddPlaceScreen extends ConsumerStatefulWidget{
 }
 
 class _AddPlaxeScreenState extends ConsumerState<AddPlaceScreen>{
-   
+  File? _pickedImage;
+  
    void _savePlaces(){
 
     final enteredTitle = _titleController.text;
@@ -20,11 +25,12 @@ class _AddPlaxeScreenState extends ConsumerState<AddPlaceScreen>{
      return;
     }
 
-    ref.read(userPlacesProvider.notifier).addPlace(enteredTitle);
+    if (_pickedImage == null) {
+      return;
+    }
+
+    ref.read(userPlacesProvider.notifier).addPlace(enteredTitle, _pickedImage!);
     Navigator.of(context).pop();
-
-    
-
 
    }
 
@@ -52,10 +58,19 @@ class _AddPlaxeScreenState extends ConsumerState<AddPlaceScreen>{
             TextField(
               decoration:const InputDecoration(
                 label: Text('Title'),
+                hintText: 'Enter your title',
               ),
               controller:_titleController,
               style:TextStyle(color:Theme.of(context).colorScheme.onBackground) ,
             ),
+            SizedBox(height: 16,),
+            ImageInput(onPickImage: (image){
+              setState((){
+                _pickedImage = image;
+              });
+            }),
+            SizedBox(height: 16,),
+            LocationInput(),
             SizedBox(height: 16,),
             ElevatedButton.icon(
               onPressed:_savePlaces, 
