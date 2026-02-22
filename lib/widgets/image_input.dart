@@ -1,14 +1,17 @@
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
-class ImageInput extends StatefulWidget {
-  final void Function(File) onPickImage;
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
+class ImageInput extends StatefulWidget {
   const ImageInput({super.key, required this.onPickImage});
 
+  final void Function(File image) onPickImage;
+
   @override
-  State<ImageInput> createState() => _ImageInputState();
+  State<ImageInput> createState() {
+    return _ImageInputState();
+  }
 }
 
 class _ImageInputState extends State<ImageInput> {
@@ -34,38 +37,66 @@ class _ImageInputState extends State<ImageInput> {
 
   @override
   Widget build(BuildContext context) {
-    Widget content = TextButton.icon(
-      icon: const Icon(Icons.camera),
-      label: const Text('Take Picture'),
-      onPressed: _takePicture,
-    );
-
-    if (_selectedImage != null) {
-      content = GestureDetector(
-        onTap: _takePicture,
-        child: Image.file(
-          _selectedImage!,
-          fit: BoxFit.cover,
-          width: double.infinity,
-          height: double.infinity,
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Container(
+        height: 250,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: Theme.of(context).colorScheme.surface,
         ),
-      );
-    }
-
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(
-          width: 1,
-          color: Theme.of(context)
-              .colorScheme
-              .primary
-              .withOpacity(0.2),
-        ),
+        child: _selectedImage == null
+            ? InkWell(
+                onTap: _takePicture,
+                borderRadius: BorderRadius.circular(12),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.camera_alt_outlined,
+                      size: 64,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Tap to Take Picture',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'or press the button below',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Colors.grey,
+                          ),
+                    ),
+                  ],
+                ),
+              )
+            : Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.file(
+                      _selectedImage!,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 12,
+                    right: 12,
+                    child: FloatingActionButton.small(
+                      onPressed: _takePicture,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      child: const Icon(Icons.edit),
+                    ),
+                  ),
+                ],
+              ),
       ),
-      height: 250,
-      width: double.infinity,
-      alignment: Alignment.center,
-      child: content,
     );
   }
 }
