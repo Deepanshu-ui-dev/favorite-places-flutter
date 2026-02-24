@@ -19,12 +19,14 @@ class AddPlaceScreen extends ConsumerStatefulWidget {
 
 class _AddPlaceScreenState extends ConsumerState<AddPlaceScreen> {
   final _titleController = TextEditingController();
+  final _detailsController = TextEditingController();
   File? _selectedImage;
   PlaceLocation? _selectedLocation;
   bool _isLoading = false;
 
   void _savePlace() {
     final enteredTitle = _titleController.text.trim();
+    final enteredDetails = _detailsController.text.trim();
 
     if (enteredTitle.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -52,7 +54,7 @@ class _AddPlaceScreenState extends ConsumerState<AddPlaceScreen> {
     try {
       ref
           .read(userPlacesProvider.notifier)
-          .addPlace(enteredTitle, _selectedImage!, _selectedLocation!);
+          .addPlace(enteredTitle, _selectedImage!, _selectedLocation!, enteredDetails);
       Navigator.of(context).pop();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -66,6 +68,7 @@ class _AddPlaceScreenState extends ConsumerState<AddPlaceScreen> {
   @override
   void dispose() {
     _titleController.dispose();
+    _detailsController.dispose();
     super.dispose();
   }
 
@@ -145,7 +148,47 @@ class _AddPlaceScreenState extends ConsumerState<AddPlaceScreen> {
                 _selectedLocation = location;
               },
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 24),
+            Text(
+              'Details (Optional)',
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              decoration: InputDecoration(
+                hintText: 'Enter place details...',
+                hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.7)),
+                prefixIcon: Icon(Icons.description, color: Theme.of(context).colorScheme.primary),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                filled: true,
+                fillColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+              ),
+              controller: _detailsController,
+              textInputAction: TextInputAction.newline,
+              minLines: 3,
+              maxLines: 5,
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+            ),
+
+
+            const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
               height: 50,
