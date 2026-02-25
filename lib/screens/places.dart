@@ -5,7 +5,6 @@ import 'package:favorite_places/screens/add_places.dart';
 import 'package:favorite_places/widgets/places_list.dart';
 import 'package:favorite_places/providers/user_places.dart';
 
-
 class PlacesScreen extends ConsumerStatefulWidget {
   const PlacesScreen({super.key});
 
@@ -15,55 +14,54 @@ class PlacesScreen extends ConsumerStatefulWidget {
   }
 }
 
-
 class _PlacesScreenState extends ConsumerState<PlacesScreen> {
   late Future<void> _placesFuture;
 
   @override
   void initState() {
     super.initState();
-    // In a real application, _placesFuture would likely fetch data from a database or API.
-    // For this example, we'll keep it as Future.value() as in the original code,
-    // but the UI will now correctly handle the empty list state.
-    _placesFuture = Future.value();
+
+    
+    _placesFuture =
+        ref.read(userPlacesProvider.notifier).loadPlaces();
   }
 
   @override
   Widget build(BuildContext context) {
     final userPlaces = ref.watch(userPlacesProvider);
 
-    Widget content = Center(
-      child: Text(
-        'No places added yet. Start adding some!',
-        style: Theme.of(context).textTheme.titleLarge!.copyWith(
-              color: Theme.of(context).colorScheme.onBackground,
-            ),
-      ),
-    );
-
-    if (userPlaces.isNotEmpty) {
-      content = PlacesList(
-        places: userPlaces,
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your Places'),
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
-        elevation: 4,
-        shadowColor: Theme.of(context).colorScheme.shadow,
       ),
       body: FutureBuilder(
         future: _placesFuture,
-        builder: (context, snapshot) =>
-            snapshot.connectionState == ConnectionState.waiting
-                ? const Center(child: CircularProgressIndicator())
-                : Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: content,
-                  ),
+        builder: (context, snapshot) {
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          if (userPlaces.isEmpty) {
+            return const Center(
+              
+              child: Column(
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 24,),
+                  Text(
+                'No places added yet. Start adding some!',
+              ),
+                ],
+              ),
+              
+            );
+          }
+
+          return PlacesList(places: userPlaces);
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -74,11 +72,7 @@ class _PlacesScreenState extends ConsumerState<PlacesScreen> {
           );
         },
         child: const Icon(Icons.add),
-        backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
-        foregroundColor: Theme.of(context).colorScheme.onSecondaryContainer,
       ),
     );
   }
 }
-
-
