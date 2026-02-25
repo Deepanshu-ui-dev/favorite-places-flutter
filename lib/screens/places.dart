@@ -21,7 +21,7 @@ class _PlacesScreenState extends ConsumerState<PlacesScreen> {
   void initState() {
     super.initState();
 
-    
+    // 🔥 Load places from database
     _placesFuture =
         ref.read(userPlacesProvider.notifier).loadPlaces();
   }
@@ -46,17 +46,9 @@ class _PlacesScreenState extends ConsumerState<PlacesScreen> {
 
           if (userPlaces.isEmpty) {
             return const Center(
-              
-              child: Column(
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 24,),
-                  Text(
+              child: Text(
                 'No places added yet. Start adding some!',
               ),
-                ],
-              ),
-              
             );
           }
 
